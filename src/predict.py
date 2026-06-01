@@ -1,7 +1,5 @@
 import argparse
-
 import joblib
-
 from preprocess import clean_text
 
 
