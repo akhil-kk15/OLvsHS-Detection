@@ -698,13 +698,13 @@ Save the best classic ML model:
 ```python
 import joblib
 
-joblib.dump(best_model, "hate_offensive_detection/models/best_tfidf_model.joblib")
+joblib.dump(best_model, "models/best_tfidf_model.joblib")
 ```
 
 Load and predict:
 
 ```python
-model = joblib.load("hate_offensive_detection/models/best_tfidf_model.joblib")
+model = joblib.load("models/best_tfidf_model.joblib")
 
 def predict_label(text: str):
     clean = clean_text(text)
@@ -831,7 +831,7 @@ Training:
 from transformers import TrainingArguments, Trainer
 
 training_args = TrainingArguments(
-    output_dir="hate_offensive_detection/models/distilbert_hate_offensive",
+    output_dir="models/distilbert_hate_offensive",
     learning_rate=2e-5,
     per_device_train_batch_size=16,
     per_device_eval_batch_size=16,
@@ -1050,7 +1050,7 @@ plt.title("Confusion Matrix")
 plt.show()
 
 # 8. Save model
-joblib.dump(model, "hate_offensive_detection/models/logreg_tfidf.joblib")
+joblib.dump(model, "models/logreg_tfidf.joblib")
 ```
 
 ---

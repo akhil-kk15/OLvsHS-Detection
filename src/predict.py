@@ -5,7 +5,7 @@ from preprocess import clean_text
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Predict one text label.")
-    parser.add_argument("--model", default="hate_offensive_detection/models/best_model.joblib")
+    parser.add_argument("--model", default="models/best_model.joblib")
     parser.add_argument("--text", required=True)
     return parser.parse_args()
 
@@ -25,4 +25,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

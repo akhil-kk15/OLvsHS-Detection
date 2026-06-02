@@ -54,7 +54,7 @@ def parse_args():
     parser.add_argument("--test-size", type=float, default=0.15)
     parser.add_argument("--dev-size", type=float, default=0.15)
     parser.add_argument("--random-state", type=int, default=42)
-    parser.add_argument("--models-dir", default="hate_offensive_detection/models")
+    parser.add_argument("--models-dir", default="models")
     parser.add_argument("--figures-dir", default="hate_offensive_detection/reports/figures")
     return parser.parse_args()
 
@@ -253,4 +253,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

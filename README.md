@@ -10,8 +10,6 @@ It follows the course pipeline: preprocessing, BoW/TF-IDF features, Naive Bayes 
 
 ## 1. Install Libraries
 
-From `/home/akhilkk/Desktop/NLP`:
-
 ```bash
 pip install pandas numpy scikit-learn matplotlib seaborn joblib
 ```
@@ -40,11 +38,11 @@ Davidson label mapping:
 
 ## 3. Train
 
-Run from `/home/akhilkk/Desktop/NLP`:
+Run from the repository root:
 
 ```bash
-python3 hate_offensive_detection/src/train.py \
-  --data hate_offensive_detection/data/raw/labeled_data.csv \
+python3 src/train.py \
+  --data data/labeled_data.csv \
   --text-col tweet \
   --label-col class \
   --label-map davidson
@@ -60,15 +58,15 @@ It chooses the best model by development-set macro F1.
 ## 4. Outputs
 
 ```text
-hate_offensive_detection/models/best_model.joblib
-hate_offensive_detection/models/results.txt
+models/best_model.joblib
+models/results.txt
 hate_offensive_detection/reports/figures/confusion_matrix.png
 ```
 
 ## 5. Predict
 
 ```bash
-python3 hate_offensive_detection/src/predict.py \
+python3 src/predict.py \
   --text "I strongly disagree with this decision."
 ```
 
@@ -77,10 +75,9 @@ python3 hate_offensive_detection/src/predict.py \
 If your dataset already has columns named `text` and `label` with labels exactly equal to `hate_speech`, `offensive_language`, and `neither`, use:
 
 ```bash
-python3 hate_offensive_detection/src/train.py \
-  --data hate_offensive_detection/data/raw/dataset.csv \
+python3 src/train.py \
+  --data data/dataset.csv \
   --text-col text \
   --label-col label \
   --label-map none
 ```
-
