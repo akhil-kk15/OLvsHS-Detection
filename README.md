@@ -69,11 +69,6 @@ The dataset file may not be included in the GitHub repository if it is large or 
 
 Clone the repository and move into the project folder:
 
-```bash
-git clone <your-repository-url>
-cd NLP_mini-Project
-```
-
 Create a virtual environment:
 
 ```bash
