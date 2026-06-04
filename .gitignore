@@ -1,3 +1,4 @@
 Hate_Speech_Offensive_Language_Detection_Guide.md
 .venv/
 __pycache__/
+prediction_log.txt
