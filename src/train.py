@@ -15,14 +15,14 @@ from sklearn.metrics import (
     classification_report,
     confusion_matrix,
     f1_score,
-)
+) 
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import FeatureUnion, Pipeline
 
 from lexiconfeatures import LexiconFeatures
 from preprocess import clean_text
-
+from sklearn.preprocessing import FunctionTransformer
 
 LABEL_MAPS = {
     "davidson": {0: "hate_speech", 1: "offensive_language", 2: "neither"},
@@ -122,7 +122,7 @@ def build_models(random_state):
         )),
         ("clf", LogisticRegression(
             max_iter=3000,
-            class_weight="balanced",
+            # class_weight="balanced",
             random_state=random_state,
         )),
     ])
@@ -203,6 +203,20 @@ def save_confusion_matrix(labels, preds, path):
     plt.savefig(path, dpi=200)
     plt.close()
 
+
+
+
+def scale_lexicon(X):
+    return X * 13.0  # multiply lexicon features to increase influence
+
+    shared_features = FeatureUnion([
+    ("word_tfidf", TfidfVectorizer(...)),
+    ("char_tfidf", TfidfVectorizer(...)),
+    ("lexicon", Pipeline([              # ← wrap in a mini pipeline to scale
+        ("feats",  LexiconFeatures()),
+        ("scale",  FunctionTransformer(scale_lexicon)),
+    ])),
+])
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
