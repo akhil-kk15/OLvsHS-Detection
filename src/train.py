@@ -20,6 +20,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import FeatureUnion, Pipeline
 
+from logging_utils import archive_existing_output_txts, make_log_path
 from lexiconfeatures import LexiconFeatures
 from preprocess import clean_text
 from sklearn.preprocessing import FunctionTransformer
@@ -222,6 +223,8 @@ def scale_lexicon(X):
 
 def main():
     args        = parse_args()
+    project_root = Path(__file__).resolve().parents[1]
+    archived_logs = archive_existing_output_txts(project_root)
     models_dir  = Path(args.models_dir)
     figures_dir = Path(args.figures_dir)
     models_dir.mkdir(parents=True, exist_ok=True)
@@ -268,7 +271,7 @@ def main():
     save_confusion_matrix(test_df["label"], test_preds, cm_path)
     print(f"Saved confusion matrix: {cm_path}")
 
-    results_path = models_dir / "results.txt"
+    results_path = make_log_path(project_root, "results")
     with results_path.open("w", encoding="utf-8") as f:
         f.write(f"Best model: {best_name}\n")
         f.write(f"Hate speech threshold: {best_threshold:.2f}\n")
@@ -276,6 +279,10 @@ def main():
         f.write(f"Test macro F1: {test_scores['macro_f1']:.4f}\n\n")
         f.write(classification_report(test_df["label"], test_preds,
                                       labels=LABEL_ORDER, zero_division=0))
+        if archived_logs:
+            f.write("\n\nArchived previous output txt files:\n")
+            for archived_log in archived_logs:
+                f.write(f"{archived_log}\n")
     print(f"Saved results: {results_path}")
 
 

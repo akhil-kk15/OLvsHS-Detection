@@ -11,7 +11,8 @@ LABEL_DISPLAY = {
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Predict one text label.")
-    parser.add_argument("--model", default="models/best_model.joblib")
+    parser.add_argument("--model", default="models/hierarchical_model.joblib")
+    #parser("--model", default="models/hierarchical_model.joblib")
     parser.add_argument("--text",  required=True)
     return parser.parse_args()
 

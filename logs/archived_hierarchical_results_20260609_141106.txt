@@ -1,0 +1,43 @@
+Model: hierarchical
+External data: True
+Calibration data: data/manual_calibration_project_mapped.csv
+Calibration weight: 50
+Gate threshold: 0.50
+Hate threshold: 0.35
+Test accuracy: 0.9002
+Test macro F1: 0.7315
+
+                    precision    recall  f1-score   support
+
+       hate_speech     0.4472    0.3364    0.3840       214
+offensive_language     0.9457    0.9368    0.9412      2879
+           neither     0.8199    0.9248    0.8692       625
+
+          accuracy                         0.9002      3718
+         macro avg     0.7376    0.7327    0.7315      3718
+      weighted avg     0.8958    0.9002    0.8970      3718
+
+
+Training data counts:
+Gate:
+binary_label
+harmful    29937
+neither    18899
+
+Severity:
+label
+offensive_language    17994
+hate_speech            4469
+
+Sanity checks:
+OK | expected=neither | predicted=neither | you're nice
+OK | expected=neither | predicted=neither | you're a decent human being
+OK | expected=neither | predicted=neither | you are a good person
+OK | expected=neither | predicted=neither | thanks for helping
+OK | expected=neither | predicted=neither | have a good day
+OK | expected=offensive_language | predicted=offensive_language | you are terrible
+OK | expected=offensive_language | predicted=offensive_language | fuck you
+OK | expected=offensive_language | predicted=offensive_language | you are an idiot
+OK | expected=hate_speech | predicted=hate_speech | hello nigger
+OK | expected=hate_speech | predicted=hate_speech | gay people are subhuman
+OK | expected=hate_speech | predicted=hate_speech | immigrants should be deported

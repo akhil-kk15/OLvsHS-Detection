@@ -1,0 +1,12 @@
+text,label,binary_label,source
+you're nice,neither,neither,manual_calibration
+you're a decent human being,neither,neither,manual_calibration
+you are a good person,neither,neither,manual_calibration
+thanks for helping,neither,neither,manual_calibration
+have a good day,neither,neither,manual_calibration
+you are terrible,offensive_language,harmful,manual_calibration
+fuck you,offensive_language,harmful,manual_calibration
+you are an idiot,offensive_language,harmful,manual_calibration
+hello nigger,hate_speech,harmful,manual_calibration
+gay people are subhuman,hate_speech,harmful,manual_calibration
+immigrants should be deported,hate_speech,harmful,manual_calibration
