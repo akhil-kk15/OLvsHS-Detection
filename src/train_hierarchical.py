@@ -49,7 +49,7 @@ def parse_args():
     parser.add_argument("--output-name", default="hierarchical_model.joblib")
     return parser.parse_args()
 
-
+#don't change the ngram features now,it might hurt the model. 
 def build_features():
     return FeatureUnion([
         ("word_tfidf", TfidfVectorizer(
@@ -138,6 +138,7 @@ def sanity_examples():
         ("fuck you", "offensive_language"),
         ("you are an idiot", "offensive_language"),
         ("hello nigger", "hate_speech"),
+        ("Negros","hate_speech"),
         ("gay people are subhuman", "hate_speech"),
         ("immigrants should be deported", "hate_speech"),
     ], columns=["text", "label"])
@@ -196,9 +197,10 @@ def tune_thresholds(gate_model, severity_model, dev_df):
     severity_classes = list(severity_model.classes_)
     hate_idx = severity_classes.index("hate_speech")
 
-    best = {"macro_f1": -1.0, "gate_threshold": 0.5, "hate_threshold": 0.5}
-    for gate_t in np.arange(0.50, 0.86, 0.05):
-        for hate_t in np.arange(0.35, 0.76, 0.05):
+#gate threshold was .5 before. hate threshold was .5 before., gate_t was from 0.50 to 0.85 before, hate_t was from 0.35 to 0.75 before.
+    best = {"macro_f1": -1.0, "gate_threshold": 0.3, "hate_threshold": 0.3}
+    for gate_t in np.arange(0.45, 0.86, 0.05):
+        for hate_t in np.arange(0.30, 0.76, 0.05):
             preds = []
             for gate_row, severity_row in zip(gate_probs, severity_probs):
                 if gate_row[harmful_idx] < gate_t:

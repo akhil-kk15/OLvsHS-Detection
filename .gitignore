@@ -8,3 +8,4 @@ prediction_log.txt
 hierarchical_results.txt
 hierarchical_results.joblib
 best_model.joblib
+/logs

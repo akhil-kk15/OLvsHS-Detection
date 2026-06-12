@@ -34,12 +34,12 @@ def predict_flat(bundle, cleaned):
         return label
     return model.predict([cleaned])[0]
 
-
+#the gate threshold was .5 before. 
 def predict_hierarchical(bundle, cleaned):
     gate_model     = bundle["gate_model"]
     severity_model = bundle["severity_model"]
-    gate_threshold = bundle.get("gate_threshold", 0.5)
-    hate_threshold = bundle.get("hate_threshold", 0.5)
+    gate_threshold = bundle.get("gate_threshold", 0.3)
+    hate_threshold = bundle.get("hate_threshold", 0.3)
 
     print(f"Gate threshold:     {gate_threshold:.2f}")
     print(f"Severity threshold: {hate_threshold:.2f}")

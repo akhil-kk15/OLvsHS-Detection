@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 RACIAL_SLURS = {
-      "negro", "negros", "nigger", "niggers", "nigga", "niggas",
+     
     "chink", "chinks", "spic", "spics", "wetback", "wetbacks",
     "gook", "gooks", "kike", "kikes", "towelhead", "raghead",
     "cracker", "honky", "coon", "coons", "sandnigger",
@@ -17,7 +17,7 @@ IDENTITY_TARGET_TERMS = {
     "chinese", "mexicans", "mexican", "blacks", "whites",
     "refugees", "refugee", "foreigners", "foreigner",
     "hispanic", "latinos", "latina", "latino", "arabs", "arab",
-    "indians", "indian",
+    "indians", "indian", "negro", "negros", "nigger", "niggers", "nigga", "niggas",
 }
 
 GENERIC_INSULTS = {
