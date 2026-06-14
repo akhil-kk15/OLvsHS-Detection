@@ -9,3 +9,21 @@ hierarchical_results.txt
 hierarchical_results.joblib
 best_model.joblib
 /logs
+
+# Duplicate or generated data files that are not needed for the current code.
+/data/.~lock.*#
+/data/labels-levela (2).csv
+/data/olid-training-v1.0 (2).tsv
+/data/testset-levela (2).tsv
+/data/test_a_labels_easy.csv
+/data/test_a_labels_hard.csv
+/data/labels-levelb.csv
+/data/labels-levelc.csv
+/data/testset-levelb.tsv
+/data/testset-levelc.tsv
+/data/test_c_tweets_all.tsv
+/data/test_c_labels_all.csv
+/data/oild-2020.csv
+/data/external_unified_project_mapped.csv
+/data/README.txt
+/data/olid-annotation.txt
