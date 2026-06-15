@@ -13,6 +13,50 @@ DEFAULT_MODEL_PATH = PROJECT_ROOT / "models" / "best_model.joblib"
 HIER_MODEL_PATH    = PROJECT_ROOT / "models" / "hierarchical_model.joblib"
 
 
+def _patch_legacy_logreg_attrs(estimator):
+    """
+    Patch older scikit-learn LogisticRegression pickles that are missing
+    attributes expected by newer runtime versions.
+
+    Some saved models from older sklearn releases do not carry `multi_class`.
+    Newer runtimes touch that attribute during prediction, so we inject the
+    default value when it is missing.
+    """
+
+    if estimator is None:
+        return estimator
+
+    if estimator.__class__.__name__ == "LogisticRegression" and not hasattr(
+        estimator, "multi_class"
+    ):
+        estimator.multi_class = "auto"
+
+    named_steps = getattr(estimator, "named_steps", None)
+    if named_steps:
+        for step in named_steps.values():
+            _patch_legacy_logreg_attrs(step)
+        return estimator
+
+    steps = getattr(estimator, "steps", None)
+    if steps:
+        for _, step in steps:
+            _patch_legacy_logreg_attrs(step)
+
+    return estimator
+
+
+def normalize_loaded_bundle(bundle):
+    """Patch known compatibility issues on a loaded baseline bundle."""
+
+    if isinstance(bundle, dict):
+        for key in ("model", "gate_model", "severity_model"):
+            if key in bundle:
+                bundle[key] = _patch_legacy_logreg_attrs(bundle[key])
+        return bundle
+
+    return _patch_legacy_logreg_attrs(bundle)
+
+
 def _predict_flat(bundle, cleaned):
     model     = bundle["model"] if isinstance(bundle, dict) else bundle
     threshold = bundle.get("hate_threshold", 0.5) if isinstance(bundle, dict) else 0.5

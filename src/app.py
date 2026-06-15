@@ -5,6 +5,7 @@ import streamlit as st
 
 from llm_predict import llm_is_configured, predict_llm
 from logging_utils import archive_existing_output_txts, make_log_path
+from model import normalize_loaded_bundle
 from preprocess import clean_text
 from transformer_utils import load_transformer_bundle, predict_transformer
 
@@ -38,7 +39,7 @@ def load_baseline_model():
             "No baseline model found. Train the logistic-regression or "
             "hierarchical model first."
         )
-    return joblib.load(model_path)
+    return normalize_loaded_bundle(joblib.load(model_path))
 
 
 @st.cache_resource

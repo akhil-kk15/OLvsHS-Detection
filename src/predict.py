@@ -1,5 +1,6 @@
 import argparse
 import joblib
+from model import normalize_loaded_bundle
 from preprocess import clean_text
 
 LABEL_DISPLAY = {
@@ -69,7 +70,7 @@ def predict_hierarchical(bundle, cleaned):
 
 def main():
     args    = parse_args()
-    bundle  = joblib.load(args.model)
+    bundle  = normalize_loaded_bundle(joblib.load(args.model))
     cleaned = clean_text(args.text)
 
     print(f"Input:   {args.text}")
