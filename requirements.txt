@@ -6,3 +6,6 @@ seaborn
 joblib
 streamlit
 imbalanced-learn
+torch
+transformers
+accelerate

@@ -9,6 +9,9 @@ hierarchical_results.txt
 hierarchical_results.joblib
 best_model.joblib
 /logs
+/models/distilbert_hsvol/
+/models/hatebert_hsvol/
+/models/*/checkpoints/
 
 # Duplicate or generated data files that are not needed for the current code.
 /data/.~lock.*#
