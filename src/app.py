@@ -3,7 +3,6 @@ from pathlib import Path
 import joblib
 import streamlit as st
 
-from llm_predict import llm_is_configured, predict_llm
 from logging_utils import archive_existing_output_txts, make_log_path
 from model import normalize_loaded_bundle
 from preprocess import clean_text
@@ -159,10 +158,10 @@ st.write("Paste a sentence or short social-media post to classify it.")
 
 model_choice = st.selectbox(
     "Choose model",
-    ["Current Logistic Regression", "DistilBERT", "HateBERT", "LLM/API"],
+    ["Logistic regression (2 stage, baseline)", "DistilBERT", "HateBERT"],
 )
 
-if model_choice == "Current Logistic Regression":
+if model_choice == "Logistic regression (2 stage, baseline)":
     if not BASELINE_MODEL_PATH.exists():
         st.error(
             "No baseline model found. Train first:\n\n"
@@ -185,16 +184,6 @@ elif model_choice in {"DistilBERT", "HateBERT"}:
     bundle = load_transformer_model(str(model_dir))
     model_label = f"Transformer: {model_choice}"
     model_hint = model_dir.name
-else:
-    bundle = None
-    model_label = "Optional LLM/API"
-    model_hint = "external API"
-    if not llm_is_configured():
-        st.info(
-            "The LLM/API branch is optional and is not configured yet. "
-            "Set `LLM_API_KEY` and `LLM_MODEL` and add your client logic in "
-            "`src/llm_predict.py` to enable it."
-        )
 
 if (
     "prediction_log_path" not in st.session_state
@@ -224,14 +213,11 @@ if st.button("Check text"):
         st.warning("Please enter some text.")
     else:
         try:
-            if model_choice == "Current Logistic Regression":
+            if model_choice == "Logistic regression (2 stage, baseline)":
                 label, sections = predict_baseline(bundle, user_input)
             elif model_choice in {"DistilBERT", "HateBERT"}:
                 label, probs = predict_transformer(bundle, user_input)
                 sections = {"Transformer probabilities": probs}
-            else:
-                label, probs = predict_llm(user_input)
-                sections = {"LLM probabilities": probs} if probs else {}
         except Exception as exc:
             st.error(f"Prediction failed: {exc}")
             st.stop()
