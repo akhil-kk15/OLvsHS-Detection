@@ -113,15 +113,21 @@ def write_prediction_log(path, text, label, sections):
     """Append one prediction record to the active log file."""
 
     with Path(path).open("a", encoding="utf-8") as f:
-        f.write("=" * 80 + "\n")
-        f.write(f"Input text: {text}\n")
-        f.write(f"Predicted label: {label}\n")
-        for title, probs in (sections or {}).items():
-            if not probs:
-                continue
-            f.write(f"{title}:\n")
-            for cls, prob in probs.items():
-                f.write(f"  - {cls}: {prob:.4f}\n")
+        f.write(build_prediction_log_text(text, label, sections))
+        f.write("\n")
+
+
+def build_prediction_log_text(text, label, sections):
+    """Build a readable multi-line log block for the UI and log file."""
+
+    lines = ["=" * 80, f"Input text: {text}", f"Predicted label: {label}"]
+    for title, probs in (sections or {}).items():
+        if not probs:
+            continue
+        lines.append(title + ":")
+        for cls, prob in probs.items():
+            lines.append(f"  - {cls}: {prob:.4f}")
+    return "\n".join(lines)
 
 
 def render_sections(sections):
@@ -223,6 +229,11 @@ if st.button("Check text"):
             st.stop()
 
         display_label = LABEL_DISPLAY.get(label, label)
+        prediction_log_text = build_prediction_log_text(
+            user_input,
+            label,
+            sections,
+        )
         write_prediction_log(
             st.session_state.prediction_log_path,
             user_input,
@@ -238,3 +249,5 @@ if st.button("Check text"):
             st.success(display_label)
 
         render_sections(sections)
+        with st.expander("Full prediction log", expanded=True):
+            st.code(prediction_log_text, language="text")
