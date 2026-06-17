@@ -1,9 +1,4 @@
-"""Optional LLM/API prediction hook.
-
-This project does not depend on an external API key by default. The module is
-kept as a small, explicit placeholder so the Streamlit app can show the branch
-without breaking the local baseline or transformer workflow.
-"""
+# futureImplementation: This file is a placeholder for an API-backed LLM classifier. It checks if the necessary API settings are present and raises an error if they are not configured. The `predict_llm` function is intended to be implemented later with a hosted model, and it should return a label and a probability dictionary consistent with other predictors.
 
 import os
 

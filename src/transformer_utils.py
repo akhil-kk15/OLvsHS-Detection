@@ -1,4 +1,3 @@
-"""Shared transformer loading and inference helpers."""
 
 import json
 from pathlib import Path

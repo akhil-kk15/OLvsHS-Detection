@@ -39,7 +39,7 @@ LABEL_MAPS = {
 LABEL_ORDER = ["hate_speech", "offensive_language", "neither"]
 
 
-# ── CLI ───────────────────────────────────────────────────────────────────────
+# ── CLI 
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -56,7 +56,7 @@ def parse_args():
     return parser.parse_args()
 
 
-# ── Data ──────────────────────────────────────────────────────────────────────
+# ── Data
 
 def load_dataset(path, text_col, label_col, label_map_name):
     df = pd.read_csv(path)
@@ -91,8 +91,7 @@ def split_dataset(df, test_size, dev_size, random_state):
     return train_df, dev_df, test_df
 
 
-# ── Models ────────────────────────────────────────────────────────────────────
-
+# ── Models 
 def build_models(random_state):
     # Fix 2: LexiconFeatures added to FeatureUnion
     shared_features = FeatureUnion([
@@ -131,7 +130,7 @@ def build_models(random_state):
     return {"naive_bayes_count": nb_model, "logreg_word_char_tfidf": logreg_model}
 
 
-# ── Threshold tuning (Fix 1) ──────────────────────────────────────────────────
+# ── Threshold tuning (Fix 1) ─
 
 def find_best_hate_threshold(model, texts, labels):
     """
@@ -168,8 +167,7 @@ def find_best_hate_threshold(model, texts, labels):
     return best_t
 
 
-# ── Evaluation ────────────────────────────────────────────────────────────────
-
+# ── Evaluation 
 def evaluate_model(name, model, split_name, texts, labels, threshold=0.5):
     if hasattr(model, "predict_proba") and threshold != 0.5:
         probs    = model.predict_proba(texts)
@@ -213,13 +211,13 @@ def scale_lexicon(X):
     shared_features = FeatureUnion([
     ("word_tfidf", TfidfVectorizer(...)),
     ("char_tfidf", TfidfVectorizer(...)),
-    ("lexicon", Pipeline([              # ← wrap in a mini pipeline to scale
+    ("lexicon", Pipeline([              # wrap in a mini pipeline to scale
         ("feats",  LexiconFeatures()),
         ("scale",  FunctionTransformer(scale_lexicon)),
     ])),
 ])
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+
 
 def main():
     args        = parse_args()

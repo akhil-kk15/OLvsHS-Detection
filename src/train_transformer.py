@@ -1,4 +1,3 @@
-"""Train a transformer classifier for the HSvOL project."""
 
 import argparse
 import json

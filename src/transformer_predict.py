@@ -1,4 +1,4 @@
-"""Command line prediction entry point for transformer checkpoints."""
+
 
 import argparse
 from pathlib import Path
