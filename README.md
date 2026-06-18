@@ -1,61 +1,107 @@
 # Hate Speech vs Offensive Language Detection
 
-This project is a supervised NLP text-classification system for detecting whether a short text is:
+> Warning: this project works with highly offensive text, including racist, sexist, homophobic, and otherwise abusive language. The models are imperfect, and short insults or context-dependent sentences can still be misclassified.
+
+This repository detects one of three labels in short social-media text:
 
 - `hate_speech`
 - `offensive_language`
 - `neither`
 
-It includes preprocessing, TF-IDF feature extraction, classic machine-learning classifiers, evaluation metrics, a saved model, command-line prediction, and a Streamlit web interface.
+It includes:
 
-## Project Structure
+- a flat classical baseline in [src/train.py](src/train.py)
+- a two-stage hierarchical model in [src/train_hierarchical.py](src/train_hierarchical.py)
+- a transformer model in [src/train_transformer.py](src/train_transformer.py)
+- a Streamlit demo in [src/app.py](src/app.py)
 
-```text
-NLP_mini-Project/
-  data/
-    labeled_data.csv
-  models/
-    best_model.joblib
-    results.txt
-  reports/
-    figures/
-      confusion_matrix.png
-  src/
-    app.py
-    lexiconfeatures.py
-    model.py
-    predict.py
-    preprocess.py
-    train.py
-  requirements.txt
-  README.md
+## Quick Start
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python src/train_hierarchical.py --data-dir data --models-dir models
+streamlit run src/app.py
 ```
 
-Generated runtime files:
+If you want the transformer instead of the hierarchical model, train `src/train_transformer.py` first and then use the app.
+
+## Models
+
+### Flat baseline
+
+- TF-IDF word n-grams
+- TF-IDF character n-grams
+- lexicon features
+- logistic regression and Naive Bayes candidates
+
+### Two-stage hierarchical model
+
+- stage 1: `harmful` vs `neither`
+- stage 2: `hate_speech` vs `offensive_language`
+- TF-IDF features + lexicon features + logistic regression
+
+### Transformer model
+
+- fine-tuned encoder model such as DistilBERT
+- direct 3-class prediction
+- optional external rows and calibration rows during training
+
+## Results
+
+Current logs show that the stronger models are clearly better than the flat baseline.
+
+| Model | Accuracy | Macro F1 | Notes |
+|---|---:|---:|---|
+| Flat logistic-regression baseline | 0.8569 | 0.7259 | Classical baseline |
+| Two-stage hierarchical model | 0.8983 | 0.7427 | Best classical model in the repo |
+| DistilBERT transformer | 0.9102 | 0.7541 | Best overall run in the shared logs |
+
+The weakest class across all models is usually `hate_speech`, especially on recall.
+
+## Repository Layout
 
 ```text
-prediction_log.txt
+data/
+logs/
+models/
+reports/figures/
+src/
 ```
 
-`prediction_log.txt` is created when users submit text through the Streamlit app.
+Key scripts:
 
-## Dataset
+- [src/train.py](src/train.py) trains the classical baseline.
+- [src/train_hierarchical.py](src/train_hierarchical.py) trains the two-stage model.
+- [src/train_transformer.py](src/train_transformer.py) fine-tunes a transformer classifier.
+- [src/predict.py](src/predict.py) predicts with the saved classical or hierarchical bundle.
+- [src/transformer_predict.py](src/transformer_predict.py) predicts with a transformer checkpoint.
+- [src/app.py](src/app.py) runs the Streamlit UI.
 
-The main dataset used here is the Davidson Hate Speech and Offensive Language dataset.
+## Data Used
 
-Expected CSV location:
+The main dataset is the Davidson hate speech and offensive language corpus.
 
-```text
-data/labeled_data.csv
-```
+### Core files
 
-Expected columns:
+- `data/labeled_data.csv`
+  - main Davidson-style dataset used by the flat baseline and the transformer
+- `data/olid-training-v1.0.tsv`
+  - OLID / OffensEval training file used by the hierarchical model
+- `data/testset-levela.tsv` and `data/labels-levela.csv`
+  - OLID / OffensEval level-A test data used by the hierarchical model
+- `data/test_a_tweets_all.tsv` and `data/test_a_labels_all.csv`
+  - additional project-mapped level-A files used by the hierarchical model
+- `data/external_gate_project_mapped.csv`
+  - project-processed extra rows for the gate classifier
+- `data/external_severity_project_mapped.csv`
+  - project-processed extra rows for the severity classifier
+- `data/manual_calibration_project_mapped.csv`
+  - small manually curated calibration set for hard edge cases
 
-```text
-tweet,class
-```
-
-Davidson label mapping:
+### Label mapping
 
 | Original class | Project label |
 |---:|---|
@@ -63,46 +109,49 @@ Davidson label mapping:
 | `1` | `offensive_language` |
 | `2` | `neither` |
 
-The dataset file may not be included in the GitHub repository if it is large or license-restricted. If it is missing, download it separately and place it at `data/labeled_data.csv`.
+The transformer scripts use the same project labels so results stay comparable with the classical baseline.
+
+## Citations
+
+
+- Davidson et al. 2017, *Automated Hate Speech Detection and the Problem of Offensive Language*
+  - https://arxiv.org/abs/1703.04009
+- Zampieri et al. 2019, *SemEval-2019 Task 6: Identifying and Categorizing Offensive Language in Social Media (OffensEval)*
+  - https://arxiv.org/abs/1903.08983
+- Sanh et al. 2019, *DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter*
+  - https://arxiv.org/abs/1910.01108
+- Caselli et al. 2020, *HateBERT: Retraining BERT for Abusive Language Detection in English*
+  - https://arxiv.org/abs/2010.12472
+
+The project-specific mapped CSV files in `data/` are derived and curated within this repository.
 
 ## Setup
 
-Clone the repository and move into the project folder:
-
-Create a virtual environment:
+Use Python 3.10+ if possible.
 
 ```bash
 python -m venv .venv
-```
-
-Activate it:
-
-```bash
 source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
 On Windows PowerShell:
 
 ```powershell
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
-Install dependencies:
+If you are on a CPU-only machine and `torch` pulls CUDA packages, install the CPU wheel for PyTorch instead of a CUDA wheel.
 
-```bash
-pip install --upgrade pip
-pip install -r requirements.txt
-```
+## How To Use The Project
 
-If `requirements.txt` causes version issues on another machine, install the main libraries manually:
+Run all commands from the repository root.
 
-```bash
-pip install pandas numpy scikit-learn matplotlib seaborn joblib streamlit
-```
-
-## Train The Model
-
-Run this from the repository root:
+### Train the flat baseline
 
 ```bash
 python src/train.py \
@@ -114,268 +163,132 @@ python src/train.py \
   --figures-dir reports/figures
 ```
 
-One-line version:
+Outputs:
+
+- `models/best_model.joblib`
+- `reports/figures/confusion_matrix.png`
+- timestamped `logs/results_*.txt`
+
+### Train the two-stage hierarchical model
 
 ```bash
-python src/train.py --data data/labeled_data.csv --text-col tweet --label-col class --label-map davidson --models-dir models --figures-dir reports/figures
+python src/train_hierarchical.py \
+  --data-dir data \
+  --models-dir models
 ```
 
-The training script:
+Outputs:
 
-- loads the dataset
-- maps labels to `hate_speech`, `offensive_language`, and `neither`
-- preprocesses text
-- splits data into train, development, and test sets
-- trains baseline and improved classifiers
-- chooses the best model by development macro F1
-- evaluates on the test set
-- saves the model and evaluation artifacts
+- `models/hierarchical_model.joblib`
+- timestamped `logs/hierarchical_results_*.txt`
 
-Expected outputs:
+Optional flags:
 
-```text
-models/best_model.joblib
-models/results.txt
-reports/figures/confusion_matrix.png
+- `--no-external-data`
+- `--no-calibration-data`
+- `--calibration-weight 10`
+
+### Train a transformer model
+
+```bash
+python src/train_transformer.py \
+  --data data/labeled_data.csv \
+  --text-col tweet \
+  --label-col class \
+  --label-map davidson \
+  --model-name distilbert-base-uncased \
+  --output-dir models/distilbert_hsvol
 ```
 
-## Predict From The Command Line
+Outputs:
 
-After training, run:
+- `models/distilbert_hsvol/`
+- `models/distilbert_hsvol/training_metadata.json`
+- `models/distilbert_hsvol/metrics.json`
+- timestamped `logs/transformer_results_*.txt`
+
+Optional flags:
+
+- `--external-gate-data data/external_gate_project_mapped.csv`
+- `--external-severity-data data/external_severity_project_mapped.csv`
+- `--calibration-data data/manual_calibration_project_mapped.csv`
+- `--calibration-weight 10`
+- `--no-external-data`
+- `--no-calibration-data`
+
+### Predict one text
+
+Classical or hierarchical bundle:
 
 ```bash
 python src/predict.py \
-  --model models/best_model.joblib \
+  --model models/hierarchical_model.joblib \
   --text "I strongly disagree with this decision."
 ```
 
-One-line version:
+Transformer checkpoint:
 
 ```bash
-python src/predict.py --model models/best_model.joblib --text "I strongly disagree with this decision."
+python src/transformer_predict.py \
+  --model-dir models/distilbert_hsvol \
+  --text "I strongly disagree with this decision."
 ```
 
-Example output:
-
-```text
-Prediction: neither
-hate_speech: 0.0920
-neither: 0.7281
-offensive_language: 0.1799
-```
-
-Probability values will differ if the model is retrained.
-
-## Run The Streamlit App
-
-After `models/best_model.joblib` exists, start the app:
+### Run the Streamlit demo
 
 ```bash
 streamlit run src/app.py
 ```
 
-Streamlit will print a local URL, usually:
+The app lets you choose between:
 
-```text
-http://localhost:8501
-```
+- `Logistic regression (2 stage, baseline)`
+- `DistilBERT`
+- `HateBERT`
 
-Paste text into the textbox and click **Check text**.
-
-The app shows:
-
-- predicted class
-- confidence/probability scores when available
-- a saved log entry for each submitted text
-
-## Prediction Logging
-
-The Streamlit app writes predictions to:
-
-```text
-prediction_log.txt
-```
-
-This file is saved in the project root.
-
-Each entry includes:
-
-- timestamp
-- input text
-- predicted label
-- display label
-- hate-speech threshold
-- class probabilities
-
-View the log:
-
-```bash
-cat prediction_log.txt
-```
-
-Example log entry:
-
-```text
-================================================================================
-Timestamp: 2026-06-04 12:30:00
-Input text: I strongly disagree with this decision.
-Predicted label: neither
-Display label: Neither / Clean
-Hate threshold: 0.5
-Probabilities:
-  - neither: 0.7281
-  - offensive_language: 0.1799
-  - hate_speech: 0.0920
-```
-
-## Recommended Run Order
-
-Use this order when running the project from scratch:
-
-```bash
-cd NLP_mini-Project
-source .venv/bin/activate
-
-python src/train.py --data data/labeled_data.csv --text-col tweet --label-col class --label-map davidson --models-dir models --figures-dir reports/figures
-
-python src/predict.py --model models/best_model.joblib --text "I strongly disagree with this decision."
-
-streamlit run src/app.py
-```
-
-## Testing Examples
-
-Neutral examples:
-
-```bash
-python src/predict.py --model models/best_model.joblib --text "I strongly disagree with this decision."
-python src/predict.py --model models/best_model.joblib --text "The weather is nice today."
-```
-
-Offensive-language examples:
-
-```bash
-python src/predict.py --model models/best_model.joblib --text "You are stupid."
-python src/predict.py --model models/best_model.joblib --text "Shut up, you idiot."
-```
-
-Identity-targeted examples:
-
-```bash
-python src/predict.py --model models/best_model.joblib --text "I hate all immigrants."
-python src/predict.py --model models/best_model.joblib --text "Women should not be allowed to speak here."
-```
-
-Model predictions may not always match human judgment. Short insults are especially likely to be confused with hate speech or offensive language.
+It writes prediction logs to timestamped files in `logs/` and shows the entered text plus probabilities in the UI. You do not need to retrain every time you open the app.
 
 ## Evaluation
 
-The project uses:
+The project reports:
 
 - accuracy
 - macro F1
 - per-class precision, recall, and F1
 - confusion matrix
 
-Macro F1 is important because the dataset is imbalanced. The hate-speech class is much smaller than the offensive-language class.
+Macro F1 matters because the classes are imbalanced and `hate_speech` is much rarer than `offensive_language`.
 
-After training, check:
+When you retrain, compare models on the same split and inspect:
 
-```bash
-cat models/results.txt
-```
+- overall accuracy
+- macro F1
+- `hate_speech` recall and F1
+- the confusion matrix for class imbalance errors
 
-Open the confusion matrix:
+## Generated Files
 
-```text
-reports/figures/confusion_matrix.png
-```
+Generated artifacts are intentionally kept out of version control where possible.
 
-## Troubleshooting
+Common files and folders that should stay untracked:
 
-### `ModuleNotFoundError: No module named 'joblib'`
+- `.venv/`
+- `venv/`
+- `__pycache__/`
+- `*.pyc`
+- `logs/`
+- `prediction_log.txt`
+- `models/best_model.joblib`
+- `models/hierarchical_model.joblib`
+- `models/distilbert_hsvol/`
+- `models/hatebert_hsvol/`
+- `models/*/checkpoints/`
 
-You are probably using the wrong Python interpreter. Activate the virtual environment:
+The `data/` directory also contains legacy or duplicate files that are not required by the current code. They are ignored through `.gitignore` and are not needed for a normal run.
 
-```bash
-source .venv/bin/activate
-```
+## References
 
-Then run:
-
-```bash
-python -c "import sys; print(sys.executable)"
-```
-
-It should point to `.venv/bin/python`.
-
-### `train.py: error: the following arguments are required: --data`
-
-Make sure there is a space after `--data`:
-
-```bash
-python src/train.py --data data/labeled_data.csv --text-col tweet --label-col class --label-map davidson
-```
-
-Incorrect:
-
-```bash
-python src/train.py --data/labeled_data.csv
-```
-
-### Streamlit Cannot Find The Model
-
-Train the model first:
-
-```bash
-python src/train.py --data data/labeled_data.csv --text-col tweet --label-col class --label-map davidson --models-dir models --figures-dir reports/figures
-```
-
-Then run:
-
-```bash
-streamlit run src/app.py
-```
-
-### Streamlit Is Still Showing Old Errors
-
-Stop the old app process with `Ctrl+C`, then restart:
-
-```bash
-streamlit run src/app.py
-```
-
-## Limitations
-
-This is a course-level hate/offensive-language detection system, not a production moderation tool.
-
-Known limitations:
-
-- Offensive insults may be misclassified as hate speech.
-- Hate speech can be implicit and difficult to detect.
-- The model depends strongly on the dataset's annotation style.
-- Social-media text contains slang, misspellings, sarcasm, and context gaps.
-- The model should not be used as the only basis for real moderation decisions.
-
-## Notes For GitHub
-
-Before pushing, consider whether to include large or sensitive generated files.
-
-Common files to exclude in `.gitignore`:
-
-```text
-.venv/
-venv/
-__pycache__/
-*.pyc
-prediction_log.txt
-```
-
-Depending on dataset license and file size, you may also need to exclude:
-
-```text
-data/labeled_data.csv
-models/best_model.joblib
-```
-
-If you exclude the dataset or model, mention in the README how users can recreate them by downloading the dataset and running `src/train.py`.
+- [Davidson et al. 2017](https://arxiv.org/abs/1703.04009)
+- [OffensEval / OLID 2019](https://arxiv.org/abs/1903.08983)
+- [DistilBERT 2019](https://arxiv.org/abs/1910.01108)
+- [HateBERT 2020](https://arxiv.org/abs/2010.12472)

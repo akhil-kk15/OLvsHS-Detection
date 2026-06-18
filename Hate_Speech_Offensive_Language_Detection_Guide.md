@@ -26,6 +26,89 @@ created: 2026-05-20
 
 ---
 
+## Repository Runbook
+
+Use this repository from the project root: `OLvsHS-Detection/`.
+
+### Environment Setup
+
+Create a virtual environment and install dependencies with the commands for your operating system.
+
+Linux and macOS:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Windows Command Prompt:
+
+```bat
+python -m venv .venv
+.\.venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+If PowerShell blocks activation, run:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+### Train Each Model
+
+Flat baseline:
+
+```bash
+python src/train.py --data data/labeled_data.csv --text-col tweet --label-col class --label-map davidson --models-dir models --figures-dir reports/figures
+```
+
+Hierarchical model:
+
+```bash
+python src/train_hierarchical.py --data-dir data --models-dir models
+```
+
+Transformer model:
+
+```bash
+python src/train_transformer.py --data data/labeled_data.csv --text-col tweet --label-col class --label-map davidson --output-dir models/distilbert_hsvol
+```
+
+### Predict After Training
+
+Flat or hierarchical bundle:
+
+```bash
+python src/predict.py --model models/best_model.joblib --text "I strongly disagree with this decision."
+```
+
+Transformer checkpoint:
+
+```bash
+python src/transformer_predict.py --model-dir models/distilbert_hsvol --text "I strongly disagree with this decision."
+```
+
+Streamlit demo:
+
+```bash
+streamlit run src/app.py
+```
+
+---
+
 ## 1. Goal
 
 Build a classifier:
